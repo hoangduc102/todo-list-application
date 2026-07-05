@@ -1,0 +1,23 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Todo {
+  id          String   @id @default(uuid())
+  title       String   @db.VarChar(100)
+  description String   @default("") @db.VarChar(500)
+  completed   Boolean  @default(false)
+  priority    String   @default("medium") @db.VarChar(10)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("todos")
+}

@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+*.md
+.gitignore
+.env*
+__tests__
+jest.config.ts
