@@ -218,9 +218,18 @@ export function useTodos(): UseTodosReturn {
     [fetchTodos]
   );
 
-  // Toggle todo status
+  // Toggle todo status (true optimistic update — UI cập nhật ngay, revert nếu lỗi)
   const toggleTodo = useCallback(
     async (id: string): Promise<boolean> => {
+      // Lưu state cũ để revert nếu lỗi
+      let previousTodos: Todo[] = [];
+      setTodos((prev) => {
+        previousTodos = prev;
+        return prev.map((t) =>
+          t.id === id ? { ...t, completed: !t.completed } : t
+        );
+      });
+
       try {
         const res = await fetch(`${API_BASE}/${id}/toggle`, {
           method: 'PATCH',
@@ -229,6 +238,8 @@ export function useTodos(): UseTodosReturn {
         const data: TodoResponse | ErrorResponse = await res.json();
 
         if (!res.ok || !data.success) {
+          // Revert về state cũ
+          setTodos(previousTodos);
           setError(
             (data as ErrorResponse).message ||
               'Lỗi khi thay đổi trạng thái'
@@ -236,12 +247,15 @@ export function useTodos(): UseTodosReturn {
           return false;
         }
 
+        // Đồng bộ với data thực từ server (đảm bảo chính xác)
         const updatedTodo = (data as TodoResponse).data;
         setTodos((prev) =>
           prev.map((t) => (t.id === updatedTodo.id ? updatedTodo : t))
         );
         return true;
       } catch {
+        // Revert về state cũ
+        setTodos(previousTodos);
         setError('Không thể kết nối đến server');
         return false;
       }
