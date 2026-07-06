@@ -157,7 +157,7 @@ export function useTodos(): UseTodosReturn {
     [fetchTodos]
   );
 
-  // Update todo
+  // Update todo (optimistic update — no re-fetch)
   const updateTodo = useCallback(
     async (id: string, input: UpdateTodoInput): Promise<boolean> => {
       try {
@@ -176,14 +176,18 @@ export function useTodos(): UseTodosReturn {
           return false;
         }
 
-        await fetchTodos();
+        // Cập nhật trực tiếp todo trong state thay vì gọi lại fetchTodos()
+        const updatedTodo = (data as TodoResponse).data;
+        setTodos((prev) =>
+          prev.map((t) => (t.id === updatedTodo.id ? updatedTodo : t))
+        );
         return true;
       } catch {
         setError('Không thể kết nối đến server');
         return false;
       }
     },
-    [fetchTodos]
+    []
   );
 
   // Delete todo
@@ -216,7 +220,7 @@ export function useTodos(): UseTodosReturn {
     [fetchTodos]
   );
 
-  // Toggle todo status
+  // Toggle todo status (optimistic update — no re-fetch)
   const toggleTodo = useCallback(
     async (id: string): Promise<boolean> => {
       try {
@@ -234,14 +238,18 @@ export function useTodos(): UseTodosReturn {
           return false;
         }
 
-        await fetchTodos();
+        // Cập nhật trực tiếp todo trong state thay vì gọi lại fetchTodos()
+        const updatedTodo = (data as TodoResponse).data;
+        setTodos((prev) =>
+          prev.map((t) => (t.id === updatedTodo.id ? updatedTodo : t))
+        );
         return true;
       } catch {
         setError('Không thể kết nối đến server');
         return false;
       }
     },
-    [fetchTodos]
+    []
   );
 
   return {
