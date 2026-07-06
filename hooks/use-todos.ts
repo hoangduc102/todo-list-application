@@ -127,7 +127,6 @@ export function useTodos(): UseTodosReturn {
   }, [debouncedSearch, statusFilter, sortByFilter, sortOrderFilter, page]);
 
   // Auto-fetch khi filter thay đổi
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- Fetching external data and syncing to state is a valid effect pattern
   React.useEffect(() => { fetchTodos(); }, [fetchTodos]);
 
   // Add todo
@@ -157,7 +156,7 @@ export function useTodos(): UseTodosReturn {
     [fetchTodos]
   );
 
-  // Update todo (optimistic update — no re-fetch)
+  // Update todo 
   const updateTodo = useCallback(
     async (id: string, input: UpdateTodoInput): Promise<boolean> => {
       try {
@@ -176,7 +175,6 @@ export function useTodos(): UseTodosReturn {
           return false;
         }
 
-        // Cập nhật trực tiếp todo trong state thay vì gọi lại fetchTodos()
         const updatedTodo = (data as TodoResponse).data;
         setTodos((prev) =>
           prev.map((t) => (t.id === updatedTodo.id ? updatedTodo : t))
@@ -220,7 +218,7 @@ export function useTodos(): UseTodosReturn {
     [fetchTodos]
   );
 
-  // Toggle todo status (optimistic update — no re-fetch)
+  // Toggle todo status
   const toggleTodo = useCallback(
     async (id: string): Promise<boolean> => {
       try {
@@ -238,7 +236,6 @@ export function useTodos(): UseTodosReturn {
           return false;
         }
 
-        // Cập nhật trực tiếp todo trong state thay vì gọi lại fetchTodos()
         const updatedTodo = (data as TodoResponse).data;
         setTodos((prev) =>
           prev.map((t) => (t.id === updatedTodo.id ? updatedTodo : t))
